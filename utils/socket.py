@@ -13,7 +13,7 @@ class SocketServer:
 
     def start(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind(self.host, self.port)
+        self.socket.bind((self.host, self.port))
         self.socket.listen(1)
         self.client, self.addr = self.socket.accept()
 
@@ -33,3 +33,5 @@ class SocketServer:
     def receive_json(self):
         json_str = self.client.recv(1024)
         json_data = json.loads(json_str.decode('utf-8'))
+        print(f'received json: {json_data}')
+        return json_data
