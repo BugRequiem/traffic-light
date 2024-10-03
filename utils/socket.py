@@ -32,6 +32,8 @@ class SocketServer:
 
     def receive_json(self):
         json_str = self.client.recv(1024)
+        if not json_str:
+            return None
         json_data = json.loads(json_str.decode('utf-8'))
         print(f'received json: {json_data}')
         return json_data
