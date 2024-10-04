@@ -2,5 +2,12 @@
     "socket": {
         "host" : "192.168.20.120",
         "port" : 12345
+    },
+    "camera": {
+        "device" : "/dev/video0",
+        "width" : 1920,
+        "height" : 1080,
+        "framerate" : 30,
+        "pformat" : "JPEG"
     }
 }
