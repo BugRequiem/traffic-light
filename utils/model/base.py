@@ -7,11 +7,15 @@ from abc import ABC, abstractmethod
 
 class ModelBase(ABC):
     
-    def __init__(self, path):
+    def __init__(self, modelcfg):
+        path = modelcfg["mpath"]
+        input_name = modelcfg["input"]
+        output_name = modelcfg["output"]
         logger = trt.Logger(trt.Logger.INFO)
         with open(path, "rb") as f, trt.Runtime(logger) as runtime:
             engine=runtime.deserialize_cuda_engine(f.read())
-        self.model = TRTModule(engine, input_names=["images"], output_names=['output0'])
+        self.model = TRTModule(engine, input_names=[input_name], output_names=[output_name])
+        self.imgsz = (modelcfg["imgsz"], modelcfg["imgsz"])
     
     def __call__(self, *args, **kwargs):
         return self.predict(kwargs['frame'])
