@@ -3,16 +3,16 @@ import cv2
 
 class GstreamerCamera:
 
-    def __init__(self, device, width, height, framerate, pformat):
-        self.device = device
-        self.width = width
-        self.height = height
-        self.framerate = framerate
-        self.pformat = pformat
+    def __init__(self, cameracfg):
+        self.device = cameracfg['device']
+        self.width = cameracfg['width']
+        self.height = cameracfg['height']
+        self.framerate = cameracfg['framerate']
+        self.pformat = cameracfg['pformat']
         if self.pformat == 'MJPG':
             self.gstreamer_pipeline = (
                 f"v4l2src device={self.device} ! ",
-                f"image/jpeg, width={self.width}, height={self.height}, framerate={framerate}/1 ! "
+                f"image/jpeg, width={self.width}, height={self.height}, framerate={self.framerate}/1 ! "
                 "jpegdec ! "        # 解码
                 "videoconvert ! "   # 格式转换
                 "appsink"           # 发送给应用程序
