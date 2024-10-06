@@ -9,5 +9,11 @@
         "height" : 1080,
         "framerate" : 30,
         "pformat" : "JPEG"
+    },
+    "model": {
+        "mpath" : "models/traffic_sign.engine",
+        "imgsz" : 640,
+        "input" : "images",
+        "output" : "output0"
     }
 }
