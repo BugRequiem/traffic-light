@@ -23,7 +23,6 @@ class ModelBase(ABC):
     @abstractmethod
     def preprocess(self, frame):
         pass
-        
 
     def inference(self, image):
         img_input = image.astype(np.float16)
@@ -31,7 +30,6 @@ class ModelBase(ABC):
         img_input = img_input.to(0)             # to GPU0
         output = self.model(img_input)
         return output
-        
 
     @abstractmethod
     def postprocess(self, output):
