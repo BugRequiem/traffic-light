@@ -4,9 +4,9 @@ import json
 
 class SocketServer:
 
-    def __init__(self, host, port):
-        self.host = host
-        self.port = port
+    def __init__(self, socketcfg):
+        self.host = socketcfg['host']
+        self.port = socketcfg['port']
         self.socket = None
         self.conn = None
         self.addr = None
