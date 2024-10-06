@@ -35,5 +35,6 @@ class GstreamerCamera:
         return frame
 
     def close(self):
-        self.cap.release()
-        self.cap = None
+        if self.cap.isOpened():
+            self.cap.release()
+            self.cap = None
