@@ -35,5 +35,5 @@ class SocketServer:
         if not json_str:
             return None
         json_data = json.loads(json_str.decode('utf-8'))
-        print(f'received json: {json_data}')
+        # print(f'received json: {json_data}')
         return json_data
