@@ -11,7 +11,7 @@ class GstreamerCamera:
         self.pformat = cameracfg['pformat']
         if self.pformat == 'MJPG':
             self.gstreamer_pipeline = (
-                f"v4l2src device={self.device} ! ",
+                f"v4l2src device={self.device} ! "
                 f"image/jpeg, width={self.width}, height={self.height}, framerate={self.framerate}/1 ! "
                 "jpegdec ! "        # 解码
                 "videoconvert ! "   # 格式转换
@@ -24,6 +24,7 @@ class GstreamerCamera:
                 "videoconvert ! "
                 "appsink"
             )
+        print(self.gstreamer_pipeline)
         self.cap = cv2.VideoCapture(self.gstreamer_pipeline, cv2.CAP_GSTREAMER)
         if not self.cap.isOpened():
             raise OSError('Open camera failed.')
