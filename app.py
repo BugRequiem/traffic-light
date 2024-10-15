@@ -4,6 +4,7 @@ from enum import Enum
 from utils.socket import SocketServer
 from utils.camera import GstreamerCamera
 from utils.model.sample import ModelSample
+from utils.debug import Debug
 import json
 import atexit
 
@@ -23,12 +24,14 @@ class App:
         self.lock = threading.Lock()                            # 声明互斥锁
         self.detect_flag = False                                # 声明检测线程标志
         self.status = State.STOP                                # 声明检测线程运行状态
+        self.debug = Debug(self.config['debug'])                # 声明调试信息类
     
     def run(self):
         self.server.start()
         while True:
             # 阻塞接收客户端消息
             receive_data = self.server.receive_json()
+            self.debug.log('data from client:\n', receive_data)
             if receive_data == None:
                 continue
             # 接收到客户端的启动消息
@@ -59,7 +62,7 @@ class App:
             # 调用model的detect方法获取到检测结果
             json_data = {'datas': [
                 {
-                    'label': 'green',
+                    'label': 'red',
                     'confidence': '0.9',
                     'location': [1, 2, 3, 4]
                 }
@@ -84,5 +87,5 @@ if __name__ == '__main__':
         print(f'App config:\n{json.dumps(config, indent=4)}')
     # 创建并启动服务器
     app = App(config)
-    atexit.register(app.stop())
+    atexit.register(app.stop)
     app.run()
