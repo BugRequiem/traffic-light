@@ -1,6 +1,6 @@
 {
     "socket": {
-        "host" : "192.168.20.120",
+        "host" : "192.168.13.105",
         "port" : 12345
     },
     "camera": {
@@ -8,12 +8,15 @@
         "width" : 1920,
         "height" : 1080,
         "framerate" : 30,
-        "pformat" : "JPEG"
+        "pformat" : "MJPG"
     },
     "model": {
         "mpath" : "models/traffic_sign.engine",
         "imgsz" : 640,
         "input" : "images",
         "output" : "output0"
+    },
+    "debug": {
+        "islog": true
     }
 }
