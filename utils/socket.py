@@ -15,7 +15,11 @@ class SocketServer:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((self.host, self.port))
         self.socket.listen(1)
+        print("waiting for the connection of client...")
         self.client, self.addr = self.socket.accept()
+        print("connect success!")
+        print("client addr is", self.addr)
+        print("---------------------------------------------------------------")
 
     def stop(self):
         if self.socket:
