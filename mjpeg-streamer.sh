@@ -1,0 +1,2 @@
+cd /home/dlinano/workspace/files/mjpeg-streamer/mjpg-streamer/mjpg-streamer-experimental
+./mjpg_streamer -i "./input_file.so -f /home/dlinano/workspace/TrafficLight/save -n test.jpeg -d 0.01" -o "./output_http.so -w ./www -p 8080"
