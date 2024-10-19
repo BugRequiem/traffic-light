@@ -1,18 +1,20 @@
 {
     "socket": {
-        "host" : "192.168.13.105",
+        "host" : "192.168.20.120",
         "port" : 12345
     },
     "camera": {
-        "device" : "/dev/video0",
+        "mode" : "video",
+        "device" : "traffic_light_test1.mp4",
         "width" : 1920,
         "height" : 1080,
         "framerate" : 30,
         "pformat" : "MJPG"
     },
     "model": {
-        "mpath" : "models/traffic_sign.engine",
+        "mpath" : "models/traffic_light.engine",
         "imgsz" : 640,
+        "conf" : 0.5,
         "input" : "images",
         "output" : "output0"
     },
