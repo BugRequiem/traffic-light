@@ -3,7 +3,7 @@ import time
 from enum import Enum
 from utils.socket import SocketServer
 from utils.camera import GstreamerCamera
-from utils.model.sample import ModelSample
+from utils.model.model import Model
 from utils.debug import Debug
 import json
 import atexit
@@ -20,11 +20,12 @@ class App:
         self.config = config
         self.server = SocketServer(self.config['socket'])       # 初始化socket
         self.camera = GstreamerCamera(self.config['camera'])    # 初始化相机
-        self.model = ModelSample(self.config['model'])          # 初始化模型
+        self.model = Model(self.config['model'])                # 初始化模型
         self.lock = threading.Lock()                            # 声明互斥锁
         self.detect_flag = False                                # 声明检测线程标志
         self.status = State.STOP                                # 声明检测线程运行状态
         self.debug = Debug(self.config['debug'])                # 声明调试信息类
+        print('app init success!')
     
     def run(self):
         self.server.start()
@@ -33,6 +34,13 @@ class App:
             receive_data = self.server.receive_json()
             self.debug.log('data from client:\n', receive_data)
             if receive_data == None:
+                print("restart server...")
+                self.server.stop()
+                self.server.start()
+                if self.status == State.START:
+                    with self.lock:
+                        self.detect_flag = False
+                    detect_thread.join()
                 continue
             # 接收到客户端的启动消息
             if self.status == State.STOP:  # 如果检测线程未启动
@@ -51,7 +59,6 @@ class App:
                     detect_thread.join()
                     response_data = {"status" : 'success', "message" : 'stop detecting'}
                     self.server.send_json(response_data)
-                    self.status = State.STOP
     
     # 推理与结果发送线程函数
     def send_results(self):
@@ -60,20 +67,21 @@ class App:
                 if self.detect_flag == False:
                     break
             # 调用model的detect方法获取到检测结果
-            json_data = {'datas': [
-                {
-                    'label': 'red',
-                    'confidence': '0.9',
-                    'location': [1, 2, 3, 4]
-                }
-            ]}
             start_time = time.time()
-            frame = self.camera.read()              # 从摄像头读取帧
-            # result = self.model(frame=frame)      # 模型推理获得结果
-            self.server.send_json(json_data)        # socket发送结果
+            try:
+                frame = self.camera.read()          # 从摄像头读取帧
+            except Exception as e:
+                print(f"camera read error: {e}")
+                with self.lock:
+                    self.detect_flag = False
+                break
+            result = self.model(frame=frame)        # 模型推理获得结果
+            self.server.send_json(result)           # socket发送结果
             finish_time = time.time()
             task_time = finish_time - start_time    # 单次任务所用时间
-            time.sleep(1 - task_time)               # 每秒发送一条消息
+            if 1 - task_time > 0:
+                time.sleep(1 - task_time)           # 每秒发送一条消息
+        self.status = State.STOP
 
     def stop(self):
         self.server.stop()
@@ -85,6 +93,7 @@ if __name__ == '__main__':
     with open('config.json', 'r', encoding='utf-8') as file:
         config = json.load(file)
         print(f'App config:\n{json.dumps(config, indent=4)}')
+
     # 创建并启动服务器
     app = App(config)
     atexit.register(app.stop)
