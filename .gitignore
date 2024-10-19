@@ -1,7 +1,15 @@
 __pycache__/
 test/
-*.jpeg
 test.py
 pyvenv.cfg
 /bin
 /lib
+yolov10/
+# **/*.engine
+**/*.pt
+**/*.onnx
+/ultralytics
+**/*.mp4
+**/*.jpeg
+**/*.png
+test_loadvideo.py
