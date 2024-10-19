@@ -12,4 +12,5 @@ yolov10/
 **/*.mp4
 **/*.jpeg
 **/*.png
+/save
 test_loadvideo.py
