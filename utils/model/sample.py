@@ -1,11 +1,12 @@
 from utils.model.base import ModelBase
 import numpy as np
 import cv2
+import torchvision.transforms as transforms
 
 
 class ModelSample(ModelBase):
 
-    def __init__(self, modelcfg):
+    def  __init__(self, modelcfg):
         super().__init__(modelcfg)
 
     def preprocess(self, frame):
