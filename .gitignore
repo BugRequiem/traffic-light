@@ -8,7 +8,7 @@ yolov10/
 # **/*.engine
 **/*.pt
 **/*.onnx
-/ultralytics
+# /ultralytics
 **/*.mp4
 **/*.jpeg
 **/*.png
