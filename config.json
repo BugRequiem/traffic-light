@@ -15,6 +15,7 @@
         "mpath" : "models/traffic_light.engine",
         "imgsz" : 640,
         "conf" : 0.5,
+        "save" : false,
         "input" : "images",
         "output" : "output0"
     },

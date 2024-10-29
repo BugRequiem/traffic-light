@@ -15,6 +15,7 @@ class ModelBase(ABC):
         self.model = None
         self.conf = modelcfg['conf']
         self.imgsz = modelcfg['imgsz']
+        self.save = modelcfg['save']
     
     def __call__(self, *args, **kwargs):
         return self.predict(kwargs['frame'])
@@ -65,11 +66,10 @@ class ModelBase(ABC):
             cv2.rectangle(image, start_point, end_point, color, thickness)
         cv2.imwrite('./save/output.jpg', image)
 
-    def predict(self, frame, save=True):
-        # self.load()
+    def predict(self, frame):
         image = self.preprocess(frame)
         output = self.inference(image)
         result = self.postprocess(output)
-        if save:
+        if self.save:
             self.save(image, result)
         return result

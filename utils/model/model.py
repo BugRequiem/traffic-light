@@ -15,7 +15,7 @@ class Model(ModelBase):
             self.classcfg = json.load(file)
         self.load()
         print(f'class config:\n{json.dumps(self.classcfg, indent=4)}')
-        print("-----------------------------------------------------------------")
+        print("---------------------------------------------------------------")
 
     def load(self):
         self.model = YOLOv10(self.path, task='detect')
