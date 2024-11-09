@@ -4,7 +4,6 @@ test.py
 pyvenv.cfg
 /bin
 /lib
-yolov10/
 # **/*.engine
 **/*.pt
 **/*.onnx
