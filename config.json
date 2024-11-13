@@ -4,8 +4,8 @@
         "port" : 12345
     },
     "camera": {
-        "mode" : "video",
-        "device" : "traffic_light_test1.mp4",
+        "mode" : "camera",
+        "device" : "/dev/video0",
         "width" : 1920,
         "height" : 1080,
         "framerate" : 30,
@@ -15,11 +15,14 @@
         "mpath" : "models/traffic_light.engine",
         "imgsz" : 640,
         "conf" : 0.5,
-        "save" : false,
+        "save" : true,
         "input" : "images",
         "output" : "output0"
     },
     "debug": {
         "islog": true
+    },
+    "app": {
+        "freq": 1
     }
 }

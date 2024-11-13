@@ -46,7 +46,7 @@ class ModelBase(ABC):
     def postprocess(self, output):
         pass
 
-    def save(self, image, result):
+    def tosave(self, image, result):
         if image is None:
             print("empty image!")
             return
@@ -71,5 +71,5 @@ class ModelBase(ABC):
         output = self.inference(image)
         result = self.postprocess(output)
         if self.save:
-            self.save(image, result)
+            self.tosave(image, result)
         return result

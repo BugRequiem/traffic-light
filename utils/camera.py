@@ -22,6 +22,7 @@ class GstreamerCamera:
                     f"image/jpeg, width={self.width}, height={self.height}, framerate={self.framerate}/1 ! "
                     "jpegdec ! "        # 解码
                     "videoconvert ! "   # 格式转换
+                    "videoflip method=rotate-180 ! "  # 反转图像
                     "appsink"           # 发送给应用程序
                 )
             elif self.pformat == 'YUYV':
