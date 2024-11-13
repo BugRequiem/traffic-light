@@ -108,7 +108,9 @@
 ### 启动app.py
 
 ```shell
+cd workspace
 cd traffic-light
+conda activate TensorRT
 python app.py
 ```
 
