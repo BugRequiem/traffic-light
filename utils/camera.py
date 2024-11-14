@@ -11,7 +11,7 @@ class GstreamerCamera:
         self.framerate = cameracfg['framerate']
         self.pformat = cameracfg['pformat']
         self.cap = self.initcap()
-        if not self.cap.isOpened():
+        if cap is None or not self.cap.isOpened():
             raise OSError('Open camera failed.')
     
     def initcap(self):
@@ -20,10 +20,10 @@ class GstreamerCamera:
                 self.gstreamer_pipeline = (
                     f"v4l2src device={self.device} ! "
                     f"image/jpeg, width={self.width}, height={self.height}, framerate={self.framerate}/1 ! "
-                    "jpegdec ! "        # 解码
-                    "videoconvert ! "   # 格式转换
-                    "videoflip method=rotate-180 ! "  # 反转图像
-                    "appsink"           # 发送给应用程序
+                    "jpegdec ! "                        # 解码
+                    "videoconvert ! "                   # 格式转换
+                    "videoflip method=rotate-180 ! "    # 反转图像
+                    "appsink"                           # 发送给应用程序
                 )
             elif self.pformat == 'YUYV':
                 self.gstreamer_pipeline = (
