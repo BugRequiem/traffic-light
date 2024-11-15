@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import cv2
 from abc import ABC, abstractmethod
+import logging
 
 
 class ModelBase(ABC):
@@ -16,6 +17,7 @@ class ModelBase(ABC):
         self.conf = modelcfg['conf']
         self.imgsz = modelcfg['imgsz']
         self.save = modelcfg['save']
+        self.logger = logging.getLogger('app_logger')
     
     def __call__(self, *args, **kwargs):
         return self.predict(kwargs['frame'])
@@ -48,7 +50,7 @@ class ModelBase(ABC):
 
     def tosave(self, image, result):
         if image is None:
-            print("empty image!")
+            self.logger.warning("Your saving image is empty!")
             return
         height, width, channels = image.shape
         datas = result['datas']

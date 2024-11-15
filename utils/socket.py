@@ -1,5 +1,6 @@
 import socket
 import json
+import logging
 
 
 class SocketServer:
@@ -10,16 +11,16 @@ class SocketServer:
         self.socket = None
         self.conn = None
         self.addr = None
+        self.logger = logging.getLogger('app_logger')
 
     def start(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((self.host, self.port))
         self.socket.listen(1)
-        print("waiting for the connection of client...")
+        self.logger.info("waiting for the connection of client...")
         self.client, self.addr = self.socket.accept()
-        print("connect success!")
-        print("client addr is", self.addr)
-        print("---------------------------------------------------------------")
+        self.logger.info("connect success!")
+        self.logger.info(f"client addr is {self.addr}")
 
     def stop(self):
         if self.socket:
@@ -39,5 +40,4 @@ class SocketServer:
         if not json_str:
             return None
         json_data = json.loads(json_str.decode('utf-8'))
-        # print(f'received json: {json_data}')
         return json_data

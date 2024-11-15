@@ -2,6 +2,7 @@ from utils.model.base import ModelBase
 import numpy as np
 import cv2
 import torchvision.transforms as transforms
+import logging
 
 
 class ModelSample(ModelBase):

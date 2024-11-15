@@ -1,4 +1,5 @@
 import cv2
+import logging
 
 
 class GstreamerCamera:
@@ -10,9 +11,11 @@ class GstreamerCamera:
         self.height = cameracfg['height']
         self.framerate = cameracfg['framerate']
         self.pformat = cameracfg['pformat']
+        self.logger = logging.getLogger('app_logger')
         self.cap = self.initcap()
         if self.cap is None or not self.cap.isOpened():
-            raise OSError('Open camera failed.')
+            self.logger.error('open camera failed.')
+            raise RuntimeError('Open camera failed! Check your camera param.')
     
     def initcap(self):
         if self.mode == 'camera':
@@ -32,7 +35,6 @@ class GstreamerCamera:
                     "videoconvert ! "
                     "appsink"
                 )
-            print(self.gstreamer_pipeline)
             return cv2.VideoCapture(self.gstreamer_pipeline, cv2.CAP_GSTREAMER)
         elif self.mode == 'video':
             self.gstreamer_pipeline = (
@@ -45,7 +47,6 @@ class GstreamerCamera:
                 "videoconvert ! "
                 "video/x-raw, format=(string)BGR ! "
                 "appsink")
-            print(self.gstreamer_pipeline)
             return cv2.VideoCapture(self.gstreamer_pipeline, cv2.CAP_GSTREAMER)
         else:
             return None
@@ -53,7 +54,8 @@ class GstreamerCamera:
     def read(self):
         ret, frame = self.cap.read()
         if not ret:
-            raise OSError('Read camera failed.')
+            self.logger.error('read camera failed.')
+            raise RuntimeError('Read camera failed.')
         return frame
 
     def close(self):

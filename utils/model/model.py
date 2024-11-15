@@ -13,9 +13,8 @@ class Model(ModelBase):
         super().__init__(modelcfg)
         with open('class_config.json', 'r', encoding='utf-8') as file:
             self.classcfg = json.load(file)
+        self.logger.info(f'class config:\n{json.dumps(self.classcfg, indent=4)}')
         self.load()
-        print(f'class config:\n{json.dumps(self.classcfg, indent=4)}')
-        print("---------------------------------------------------------------")
 
     def load(self):
         self.model = YOLOv10(self.path, task='detect')
@@ -49,5 +48,4 @@ class Model(ModelBase):
         }
         for i in range(0,len(result))
         ]}
-        # json_result = json.dumps(result)
         return result

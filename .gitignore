@@ -14,3 +14,4 @@ pyvenv.cfg
 /save
 test_loadvideo.py
 # app_multiprocessing.py
+app.log
