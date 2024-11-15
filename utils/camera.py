@@ -11,7 +11,7 @@ class GstreamerCamera:
         self.framerate = cameracfg['framerate']
         self.pformat = cameracfg['pformat']
         self.cap = self.initcap()
-        if cap is None or not self.cap.isOpened():
+        if self.cap is None or not self.cap.isOpened():
             raise OSError('Open camera failed.')
     
     def initcap(self):
