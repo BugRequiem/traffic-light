@@ -1,18 +1,16 @@
 import threading
 import time
-from enum import Enum
 from utils.socket import SocketServer
 from utils.camera import GstreamerCamera
 from utils.model.model import Model
-from utils.debug import Debug
 import json
 import atexit
 import multiprocessing
 import numpy as np
-import cv2
 import sys
 import logging
 import atexit
+import os
 
 
 def detect(lock, config, shape, freq, detect_msg_queue, shared_frame_array, socket_queue, error_queue):
@@ -22,13 +20,13 @@ def detect(lock, config, shape, freq, detect_msg_queue, shared_frame_array, sock
     # 自动进入暂停状态，等待开始消息
     message = 'suspend'
     logger = logging.getLogger('app_logger')
-    logger.info("detect processing start.")
     try:
         model = Model(config['model'])
     except Exception as e:
         logger.error(f'Model init error: {e}')
         error_queue.put(("detect", str(e)))
         sys.exit(-1)
+    logger.info("detect init success, start detect processing.")
     while True:
         if not detect_msg_queue.empty():
             message = detect_msg_queue.get()
@@ -62,14 +60,14 @@ def capture(lock, config, shape, cap_msg_queue, shared_frame_array, error_queue)
     # 自动进入暂停状态，等待开始消息
     message = 'suspend'
     logger = logging.getLogger('app_logger')
-    logger.info("capture processing start.")
     try:
         camera = GstreamerCamera(config['camera'])
     except Exception as e:
+        camera.close()
         logger.error(f'Camera init error: {e}')
         error_queue.put(("capture", str(e)))
         sys.exit(-1)
-
+    logger.info("capture init success, start capture processing.")
     while True:
         if not cap_msg_queue.empty():
             message = cap_msg_queue.get()
@@ -80,14 +78,17 @@ def capture(lock, config, shape, cap_msg_queue, shared_frame_array, error_queue)
         elif message == 'resume':
             try:
                 frame = camera.read()
+                logger.debug('read a frame')
             except Exception as e:
+                camera.close()
                 logger.error(f'Camera read error: {e}')
                 error_queue.put(("capture", str(e)))
-                # sys.exit(-1)
+                sys.exit(-1)
             with lock:
                 np.frombuffer(shared_frame_array.get_obj(), dtype=np.uint8).reshape(shape)[:] = frame
+            if config['camera']['mode'] == 'video':
+                time.sleep(1 / config['camera']['framerate'])
 
-# TODO 实现统一处理捕获到的错误
 
 def send():
     """
@@ -95,6 +96,8 @@ def send():
     """
     while True:
         message = socket_queue.get()
+        if message is None:
+            return
         try:
             server.send_json(message)
         except Exception as e:
@@ -110,6 +113,7 @@ def receive():
         try:
             receive_data = server.receive_json()
             if receive_data is None:
+                socket_queue.put(None)
                 raise RuntimeError('None data received')
         except Exception as e:
             logger.error(f'Socket receive message error: {e}')
@@ -127,6 +131,13 @@ def receive():
             socket_queue.put(response_data)     # 将成功消息添加到socket消息队列
 
 def app_cleanup():
+    if detect_processing.is_alive():
+        detect_processing.terminate()
+    if capture_processing.is_alive():
+        capture_processing.terminate()
+    detect_processing.join()
+    capture_processing.join()
+    logger.info("app will restart after 10 seconds")
     server.stop()
     listener.stop()
     log_queue.close()
@@ -139,6 +150,8 @@ def app_cleanup():
     error_queue.join_thread()
     socket_queue.close()
     socket_queue.join_thread()
+    time.sleep(10)
+    os.execv(sys.executable, ['python'] + sys.argv)
     
 
 if __name__ == '__main__':
@@ -178,7 +191,7 @@ if __name__ == '__main__':
     listener.start()
 
     # 打印app配置信息
-    logger.info(f'App config:\n{json.dumps(config, indent=4)}')
+    logger.debug(f'App config:\n{json.dumps(config, indent=4)}')
 
     # 初始化socket服务器
     server = SocketServer(config['socket'])
@@ -195,27 +208,52 @@ if __name__ == '__main__':
                                                       shared_frame_array,
                                                       error_queue))
     # 初始化子线程
-    send_threading = threading.Thread(target=send)
-    receive_threading = threading.Thread(target=receive)
+    send_threading = threading.Thread(target=send, daemon=True)
+    receive_threading = threading.Thread(target=receive, daemon=True)
 
     # 设置为守护进程，在主进程退出后子进程自动退出
     detect_processing.daemon = True
     capture_processing.daemon = True
-    # 等待客户端连接
-    server.start()                                      
     # 开启进程
     detect_processing.start()
     capture_processing.start()
 
-    # 开启主进程的子线程    
+    # 等待客户端连接
+    server.start()
+
+    # 开启主进程的子线程
     send_threading.start()
     receive_threading.start()
 
-    send_threading.join()
-    receive_threading.join()
-
-    detect_processing.join()
-    capture_processing.join()
-
+    # 同一进行异常处理
     while True:
-        time.sleep(1)
+        error = error_queue.get()
+        if error[0] == 'send' or error[0] == 'receive':
+            sys.exit(-1)
+        if error[0] == 'capture':
+            logger.error('failed in capture processing, suspend detect processing.')
+            # TODO 将异常消息加入socket_queue中
+            # 暂停检测进程
+            detect_msg_queue.put("suspend")
+            capture_processing.join()
+            # 尝试重新启动摄像头进程
+            capture_processing = multiprocessing.Process(target=capture,
+                                                         args=(lock, config, shape, 
+                                                               cap_msg_queue,
+                                                               shared_frame_array,
+                                                               error_queue))
+            logger.info('try to restart capture processing...')
+            capture_processing.start()
+        elif error[0] == 'detect':
+            logger.error('failed in detect processing')
+            # TODO 将异常消息加入socket_queue中
+            # 暂停摄像头进程
+            cap_msg_queue.put("suspend")
+            detect_processing.join()
+            detect_processing = multiprocessing.Process(target=detect,
+                                                        args=(lock, config, shape, freq,
+                                                                detect_msg_queue,
+                                                                shared_frame_array,
+                                                                socket_queue, error_queue))
+            logger.info('try to restart detect processing...')
+            detect_processing.start()

@@ -27,8 +27,6 @@ Crop Capability Video Capture:
         Pixel Aspect: 1/1
 ```
 
-### 查看摄像头
-
 ## 启动服务器
 
 ### 更改配置文件config.json
@@ -57,6 +55,9 @@ Crop Capability Video Capture:
     },
     "debug": {
         "islog": true                   // 启用DEBUG打印
+    },
+    "app": {
+        "freq": 1                       // 识别（即结果发送）频率
     }
 }
 ```
@@ -66,7 +67,7 @@ Crop Capability Video Capture:
 ```shell
 cd ~/workspace/traffic-light        # 进入项目目录
 conda activate TensorRT             # 激活conda环境
-python app.py                       # 启动app
+python app_multiprocessing          # 启动app
 ```
 
 ### 简要测试socket接口
@@ -75,4 +76,14 @@ python app.py                       # 启动app
     ```shell
     python client.py
     ```
+
+### 日志文件
+
+- 日志文件为app.log
+
+### 异常处理
+
+- 当socket出现异常，将关闭程序并重新启动，客户端需要重新连接
+- 当摄像头出现异常，将关闭摄像头进程并向客户端发送错误消息，且模型识别进程将**暂停**。程序会自动尝试重新启动摄像头进程，需要客户端重新发送启动检测消息。
+- 当模型检测出现异常，将关闭检测进程并向客户端发送错误消息，暂停摄像头进程将**暂停**。程序会自动尝试重新启动检测进程，需要客户端重新发送启动检测消息。
 
