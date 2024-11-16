@@ -245,7 +245,7 @@ if __name__ == '__main__':
             logger.info('try to restart capture processing...')
             capture_processing.start()
         elif error[0] == 'detect':
-            logger.error('failed in detect processing')
+            logger.error('failed in detect processing, suspend capture processing.')
             # TODO 将异常消息加入socket_queue中
             # 暂停摄像头进程
             cap_msg_queue.put("suspend")
