@@ -27,9 +27,9 @@ Crop Capability Video Capture:
         Pixel Aspect: 1/1
 ```
 
-## 启动服务器
+## 2. 启动服务器
 
-### 更改配置文件config.json
+### 2.1 更改配置文件config.json
 
 ```json
 {
@@ -62,28 +62,28 @@ Crop Capability Video Capture:
 }
 ```
 
-### 启动app.py
+### 2.2 启动app_multiprocessing.py
 
 ```shell
 cd ~/workspace/traffic-light        # 进入项目目录
 conda activate TensorRT             # 激活conda环境
-python app_multiprocessing          # 启动app
+python app_multiprocessing.py       # 启动app
 ```
 
-### 简要测试socket接口
+### 2.3 简要测试socket接口
 
 - 使用client.py测试socket接口，需要更改client.py中的`IP`和`PORT`与服务器相同
     ```shell
     python client.py
     ```
 
-### 日志文件
+### 2.4 日志文件
 
-- 日志文件为app.log
+- 日志文件为`app.log`
 
-### 异常处理
+### 2.5 异常处理
 
-- 当socket出现异常，将关闭程序并重新启动，客户端需要重新连接
+- 当socket出现异常，将关闭程序并在10秒后尝试重新启动，客户端需要**重新连接**
 - 当摄像头出现异常，将关闭摄像头进程并向客户端发送错误消息，且模型识别进程将**暂停**。程序会自动尝试重新启动摄像头进程，需要客户端重新发送启动检测消息。
 - 当模型检测出现异常，将关闭检测进程并向客户端发送错误消息，暂停摄像头进程将**暂停**。程序会自动尝试重新启动检测进程，需要客户端重新发送启动检测消息。
 
