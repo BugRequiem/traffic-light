@@ -57,7 +57,9 @@ Crop Capability Video Capture:
         "islog": true                   // 启用DEBUG打印
     },
     "app": {
-        "freq": 1                       // 识别（即结果发送）频率
+        "freq": 1,                      // 识别（即结果发送）频率
+        "python": "/home/dlinano/miniforge3/envs/TensorRT/bin/python",
+        "restart_time": 10              // 重启app等待时间（second）
     }
 }
 ```
@@ -65,6 +67,7 @@ Crop Capability Video Capture:
 ### 2.2 启动app_multiprocessing.py
 
 ```shell
+# 推荐使用多进程版本app_multiprocessing.py
 cd ~/workspace/traffic-light        # 进入项目目录
 conda activate TensorRT             # 激活conda环境
 python app_multiprocessing.py       # 启动app
@@ -79,7 +82,8 @@ python app_multiprocessing.py       # 启动app
 
 ### 2.4 日志文件
 
-- 日志文件为`app.log`
+- app运行日志文件为`app.log`
+- app所有输出日志文件为`app_start.log`
 
 ### 2.5 异常处理
 
@@ -87,3 +91,9 @@ python app_multiprocessing.py       # 启动app
 - 当摄像头出现异常，将关闭摄像头进程并向客户端发送错误消息，且模型识别进程将**暂停**。程序会自动尝试重新启动摄像头进程，需要客户端重新发送启动检测消息。
 - 当模型检测出现异常，将关闭检测进程并向客户端发送错误消息，暂停摄像头进程将**暂停**。程序会自动尝试重新启动检测进程，需要客户端重新发送启动检测消息。
 
+### 2.6 设置开机自启动
+
+```shell
+# 在项目目录下运行以下命令
+./add_reboot_cron.sh
+```
