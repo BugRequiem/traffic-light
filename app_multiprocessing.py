@@ -137,7 +137,7 @@ def app_cleanup():
         capture_processing.terminate()
     detect_processing.join()
     capture_processing.join()
-    logger.info("app will restart after 10 seconds")
+    logger.info(f"app will restart after {restart_time} seconds")
     server.stop()
     listener.stop()
     log_queue.close()
@@ -150,8 +150,8 @@ def app_cleanup():
     error_queue.join_thread()
     socket_queue.close()
     socket_queue.join_thread()
-    time.sleep(10)
-    os.execv(sys.executable, ['python'] + sys.argv)
+    time.sleep(restart_time)
+    os.execv(sys.executable, [python] + sys.argv)
     
 
 if __name__ == '__main__':
@@ -164,6 +164,8 @@ if __name__ == '__main__':
     shape = (height, width, 3)
     size = height * width * 3
     freq = config['app']['freq']
+    python = config['app']['python']
+    restart_time = config['app']['restart_time']
 
     # 定义进程间共享变量，存放图像数据
     shared_frame_array = multiprocessing.Array('B', size)
