@@ -234,7 +234,9 @@ if __name__ == '__main__':
             sys.exit(-1)
         if error[0] == 'capture':
             logger.error('failed in capture processing, suspend detect processing.')
-            # TODO 将异常消息加入socket_queue中
+            # 将异常消息加入socket_queue中
+            response_data = {"status" : 'error', "message" : 'detect processing error.'}
+            socket_queue.put(response_data)
             # 暂停检测进程
             detect_msg_queue.put("suspend")
             capture_processing.join()
@@ -248,7 +250,9 @@ if __name__ == '__main__':
             capture_processing.start()
         elif error[0] == 'detect':
             logger.error('failed in detect processing, suspend capture processing.')
-            # TODO 将异常消息加入socket_queue中
+            # 将异常消息加入socket_queue中
+            response_data = {"status" : 'error', "message" : 'capture processing error.'}
+            socket_queue.put(response_data)
             # 暂停摄像头进程
             cap_msg_queue.put("suspend")
             detect_processing.join()
