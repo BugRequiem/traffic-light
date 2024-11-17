@@ -23,6 +23,8 @@
         "islog": true
     },
     "app": {
-        "freq": 1
+        "freq": 1,
+        "python": "/home/dlinano/miniforge3/envs/TensorRT/bin/python",
+        "restart_time": 10
     }
 }
