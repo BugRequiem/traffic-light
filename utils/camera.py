@@ -15,7 +15,7 @@ class GstreamerCamera:
         self.cap = None
         self.initcap()
         if self.cap is None or not self.cap.isOpened():
-            self.logger.error('open camera failed.')
+            # self.logger.error('open camera failed.')
             raise RuntimeError('Open camera failed! Check your camera param.')
     
     def initcap(self):
@@ -52,7 +52,7 @@ class GstreamerCamera:
     def read(self):
         ret, frame = self.cap.read()
         if not ret:
-            self.logger.error('read camera failed.')
+            # self.logger.error('read camera failed.')
             raise RuntimeError('Read camera failed.')
         return frame
 

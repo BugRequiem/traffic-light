@@ -6,7 +6,9 @@ import logging
 class SocketServer:
 
     def __init__(self, socketcfg):
-        self.host = socketcfg['host']
+        # self.host = socketcfg['host']
+        self.host = None
+        self.host = self.get_host()
         self.port = socketcfg['port']
         self.socket = None
         self.conn = None
@@ -41,3 +43,16 @@ class SocketServer:
             return None
         json_data = json.loads(json_str.decode('utf-8'))
         return json_data
+
+    def get_host(self):
+        if self.host != None:
+            return self.host
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(('10.255.255.255', 1))
+            local_ip = s.getsockname()[0]
+        except Exception:
+            local_ip = '127.0.0.1'
+        finally:
+            s.close()
+        return local_ip
