@@ -73,6 +73,7 @@ cd ~/workspace/traffic-light        # 进入项目目录
 conda activate TensorRT             # 激活conda环境
 python app_multiprocessing.py       # 启动app
 ```
+- 程序启动后，摄像头进程会在初始化结束后立刻运行
 
 ### 2.3 简要测试socket接口
 
